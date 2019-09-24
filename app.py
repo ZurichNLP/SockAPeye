@@ -3,6 +3,7 @@
 from flask import Flask, request
 from flask_cors import CORS
 from sockapeye import translate
+import json
 
 model_base = "/Users/raphael/projects/sockeye-toy-models/mt19_u6_model"
 
@@ -30,5 +31,6 @@ def api_translate_get(text):
 
 # Route for front-end (post)
 @app.route('/api/translate', methods = ['POST'])
-def api_translate(text):
-    return translator.translate(request.get_json().get('text'))
+def api_translate():
+    translation = translator.translate(request.get_json().get('text'))
+    return json.dumps({ 'translation': translation })
