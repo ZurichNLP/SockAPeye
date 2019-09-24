@@ -1,9 +1,10 @@
 #! /usr/bin/env python3
 
-from flask import Flask
+from flask import Flask, request
+from flask_cors import CORS
 from sockapeye import translate
 
-model_base = "/Users/mathiasmuller/Desktop/mt19_u6_model"
+model_base = "/Users/raphael/projects/sockeye-toy-models/mt19_u6_model"
 
 sample_config = {"src_lang": "de",
                  "trg_lang": "en",
@@ -14,12 +15,20 @@ sample_config = {"src_lang": "de",
                  "bpe_vocab_threshold": 50}
 
 app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 translator = translate.Translator(**sample_config)
 
 @app.route('/')
 def index():
     return 'Translation API'
 
-@app.route('/api/translate/<text>')
-def api_translate(text):
+# Route for testing api directly (without front-end, get request)
+@app.route('/api/translate/<text>', methods = ['GET'])
+def api_translate_get(text):
     return translator.translate(text)
+
+# Route for front-end (post)
+@app.route('/api/translate', methods = ['POST'])
+def api_translate(text):
+    return translator.translate(request.get_json().get('text'))
