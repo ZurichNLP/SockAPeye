@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import sacremoses
+import logging
 
 from subword_nmt import apply_bpe
 from typing import List
@@ -78,7 +79,8 @@ class DetokenizeStep(ProcessStep):
         :param line:
         :return:
         """
-        return self.detokenizer.detokenize(line)
+        tokens = line.split(" ")
+        return self.detokenizer.detokenize(tokens)
 
 
 class TruecaseStep(ProcessStep):
@@ -118,7 +120,7 @@ class DetruecaseStep(ProcessStep):
         :param line:
         :return:
         """
-        return self.detruecaser.detruecase(line)
+        return self.detruecaser.detruecase(line, return_str=True)
 
 
 class BpeStep(ProcessStep):
@@ -192,7 +194,10 @@ class Processor(object):
         :param line:
         :return:
         """
+        logging.debug("Before processing: '%s'" % line)
+
         for step in self.steps:
             line = step.process(line)
+            logging.debug("After step '%s': '%s'" % (step.__class__.__name__, line))
 
         return line

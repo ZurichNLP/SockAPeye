@@ -1,11 +1,15 @@
 #! /usr/bin/env python3
 
+import logging
+
 from flask import Flask, request
 from flask_cors import CORS
 from sockapeye import translate
 import json
 from os import getenv
 from sockapeye.languages import LanguageResolver
+
+logging.basicConfig(level=logging.DEBUG)
 
 model_base = getenv("MODEL_BASE")
 if not model_base:
@@ -36,7 +40,7 @@ def api_translate_get(text):
 
 # Route for front-end (post)
 @app.route('/api/translate', methods = ['POST'])
-def api_translate():
+def api_translate(text):
     translation = translator.translate(request.get_json().get('text'))
     return json.dumps({ 'translation': translation })
 
@@ -44,3 +48,8 @@ def api_translate():
 @app.route('/api/languages', methods = ['GET'])
 def api_languages():
     return json.dumps(languages.available_languages())
+
+if __name__ == '__main__':
+    with app.app_context():
+        app.run(threaded=False,
+                debug=True)
