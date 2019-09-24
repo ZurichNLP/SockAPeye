@@ -4,7 +4,7 @@ import logging
 
 from flask import Flask, request
 from flask_cors import CORS
-from sockapeye import translate
+from sockapeye.translator_cache import TranslatorCache
 import json
 from os import getenv, environ
 from sockapeye.languages import LanguageResolver
@@ -15,9 +15,7 @@ model_base = getenv("MODEL_BASE")
 if not model_base:
     model_base = "/Users/raphael/projects/sockeye-toy-models/mt19_u6_model"
 
-sample_config = {"src_lang": "de",
-                 "trg_lang": "en",
-                 "model_path": model_base + "/models/model_wmt17",
+sample_config = {"model_path": model_base + "/models/model_wmt17",
                  "truecase_model_path": model_base + "/shared_models/truecase_model.de",
                  "bpe_model_path": model_base + "/shared_models/deen.bpe",
                  "bpe_vocab_path": model_base + "/shared_models/vocab.en",
@@ -26,7 +24,8 @@ sample_config = {"src_lang": "de",
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-translator = translate.Translator(**sample_config)
+# translator = translate.Translator(**sample_config)
+translator_cache = TranslatorCache(sample_config)
 languages = LanguageResolver()
 
 @app.route('/')
@@ -34,14 +33,15 @@ def index():
     return 'Translation API'
 
 # Route for testing api directly (without front-end, get request)
-@app.route('/api/translate/<text>', methods = ['GET'])
-def api_translate_get(text):
-    return translator.translate(text)
+@app.route('/api/translate/<src>/<trg>/<text>', methods = ['GET'])
+def api_translate_get(src, trg, text):
+    return translator_cache.get_or_create(src, trg).translate(text)
 
 # Route for front-end (post)
 @app.route('/api/translate', methods = ['POST'])
 def api_translate():
-    translation = translator.translate(request.get_json().get('text'))
+    values = request.get_json()
+    translation = translator_cache.get_or_create(values.get('sl'), values.get('tl')).translate(values.get('text'))
     return json.dumps({ 'translation': translation })
 
 # Allow front-end to get all available language pairs

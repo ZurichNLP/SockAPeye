@@ -21,7 +21,7 @@ class LanguageResolver:
             "languagePairs": [
                 {
                     "source": "de",
-                    "targets": ["fr", "en"]
+                    "targets": ["en", "fr"]
                 },
                 {
                     "source": "en",
