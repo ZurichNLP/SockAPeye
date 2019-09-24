@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
 import sacremoses
-import subword_nmt
 
+from subword_nmt import apply_bpe
 from typing import List
 
 
@@ -29,7 +29,7 @@ class NormalizeStep(ProcessStep):
         """
 
         """
-        super(NormalizeStep).__init__(lang, load_from)
+        super(NormalizeStep, self).__init__(lang, load_from)
         self.normalizer = sacremoses.MosesPunctNormalizer(lang=self.lang)
 
     def process(self, line: str) -> str:
@@ -49,7 +49,7 @@ class TokenizeStep(ProcessStep):
         """
 
         """
-        super(TokenizeStep).__init__(lang, load_from)
+        super(TokenizeStep, self).__init__(lang, load_from)
         self.tokenizer = sacremoses.MosesTokenizer(lang=self.lang)
 
     def process(self, line: str) -> str:
@@ -58,7 +58,7 @@ class TokenizeStep(ProcessStep):
         :param line:
         :return:
         """
-        return self.tokenizer.tokenize(line)
+        return self.tokenizer.tokenize(line, return_str=True)
 
 
 class DetokenizeStep(ProcessStep):
@@ -69,7 +69,7 @@ class DetokenizeStep(ProcessStep):
         """
 
         """
-        super(DetokenizeStep).__init__(lang, load_from)
+        super(DetokenizeStep, self).__init__(lang, load_from)
         self.detokenizer = sacremoses.MosesDetokenizer(lang=self.lang)
 
     def process(self, line: str) -> str:
@@ -89,7 +89,7 @@ class TruecaseStep(ProcessStep):
         """
 
         """
-        super(TruecaseStep).__init__(lang, load_from)
+        super(TruecaseStep, self).__init__(lang, load_from)
         self.truecaser = sacremoses.MosesTruecaser(load_from=self.load_from)
 
     def process(self, line: str) -> str:
@@ -98,7 +98,7 @@ class TruecaseStep(ProcessStep):
         :param line:
         :return:
         """
-        return self.truecaser.truecase(line)
+        return self.truecaser.truecase(line, return_str=True)
 
 
 class DetruecaseStep(ProcessStep):
@@ -109,7 +109,7 @@ class DetruecaseStep(ProcessStep):
         """
 
         """
-        super(DetruecaseStep).__init__(lang, load_from)
+        super(DetruecaseStep, self).__init__(lang, load_from)
         self.detruecaser = sacremoses.MosesDetruecaser()
 
     def process(self, line: str) -> str:
@@ -131,19 +131,22 @@ class BpeStep(ProcessStep):
         """
 
         """
-        super(BpeStep).__init__(lang, load_from)
+        super(BpeStep, self).__init__(lang, load_from)
 
         self.vocab = vocab
         self.vocab_threshold = vocab_threshold
 
-        if vocab is not None:
-            vocab = subword_nmt.apply_bpe.read_vocabulary(vocab, vocab_threshold)
+        load_from_handle = open(self.load_from, "r")
 
-        self.bpe_encoder = subword_nmt.apply_bpe.BPE(codes=self.load_from,
-                                                     merges=-1,
-                                                     separator='@@',
-                                                     vocab=vocab,
-                                                     glossaries=None)
+        if vocab is not None:
+            vocab_handle = open(vocab, "r")
+            vocab = apply_bpe.read_vocabulary(vocab_handle, vocab_threshold)
+
+        self.bpe_encoder = apply_bpe.BPE(codes=load_from_handle,
+                                         merges=-1,
+                                         separator='@@',
+                                         vocab=vocab,
+                                         glossaries=None)
 
     def process(self, line: str) -> str:
         """
@@ -162,7 +165,7 @@ class DebpeStep(ProcessStep):
         """
 
         """
-        super(DebpeStep).__init__(lang, load_from)
+        super(DebpeStep, self).__init__(lang, load_from)
 
     def process(self, line: str) -> str:
         """
