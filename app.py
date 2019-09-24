@@ -1,10 +1,16 @@
 #! /usr/bin/env python3
 
+import logging
+
 from flask import Flask, request
 from flask_cors import CORS
 from sockapeye import translate
 
-model_base = "/Users/raphael/projects/sockeye-toy-models/mt19_u6_model"
+
+logging.basicConfig(level=logging.DEBUG)
+
+model_base = "/Users/mathiasmuller/Desktop/mt19_u6_model"
+# model_base = "/Users/raphael/projects/sockeye-toy-models/mt19_u6_model"
 
 sample_config = {"src_lang": "de",
                  "trg_lang": "en",
@@ -32,3 +38,8 @@ def api_translate_get(text):
 @app.route('/api/translate', methods = ['POST'])
 def api_translate(text):
     return translator.translate(request.get_json().get('text'))
+
+if __name__ == '__main__':
+    with app.app_context():
+        app.run(threaded=False,
+                debug=True)

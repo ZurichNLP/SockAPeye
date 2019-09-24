@@ -1,5 +1,8 @@
 #! /usr/bin/env python3
 
+import time
+import logging
+
 from . import processor
 from . import adapter
 
@@ -58,7 +61,13 @@ class Translator:
         :return:
         """
         line = self.preprocessor.process(line)
+
+        tic = time.time()
         line = self.model.translate(line)
+        toc = time.time()
+
+        logging.debug("Translation time: %f seconds" % (toc - tic))
+
         line = self.postprocessor.process(line)
 
         return line

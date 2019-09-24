@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
+import mxnet as mx
+
 from sockeye import inference
-from sockeye import utils
-from contextlib import ExitStack
 
 
 class SockeyeAdapter:
@@ -10,17 +10,12 @@ class SockeyeAdapter:
         brevity_penalty_weight = 1.0
         brevity_penalty = inference.BrevityPenalty(brevity_penalty_weight)
 
-        with ExitStack() as exit_stack:
-            context = utils.determine_context(device_ids=[-1],
-                                        use_cpu=True,
-                                        disable_device_locking=False,
-                                        lock_dir='/tmp',
-                                        exit_stack=exit_stack)[0]
+        context = mx.cpu()
 
         self.models, self.source_vocabs, self.target_vocab = inference.load_models(
             context=context,
             max_input_len=None,
-            beam_size=5,
+            beam_size=1,
             batch_size=1,
             model_folders=[model_path],
             checkpoints=None,
