@@ -40,7 +40,7 @@ def api_translate_get(text):
 
 # Route for front-end (post)
 @app.route('/api/translate', methods = ['POST'])
-def api_translate(text):
+def api_translate():
     translation = translator.translate(request.get_json().get('text'))
     return json.dumps({ 'translation': translation })
 
