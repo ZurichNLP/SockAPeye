@@ -6,7 +6,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from sockapeye import translate
 import json
-from os import getenv
+from os import getenv, environ
 from sockapeye.languages import LanguageResolver
 
 logging.basicConfig(level=logging.DEBUG)
@@ -50,6 +50,9 @@ def api_languages():
     return json.dumps(languages.available_languages())
 
 if __name__ == '__main__':
+    # Bind to PORT if defined, otherwise default to 5000.
+    port = int(environ.get('PORT', 5000))
     with app.app_context():
         app.run(threaded=False,
-                debug=True)
+                debug=True,
+                port=port)
