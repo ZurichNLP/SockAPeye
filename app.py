@@ -5,6 +5,7 @@ from flask_cors import CORS
 from sockapeye import translate
 import json
 from os import getenv
+from sockapeye.languages import LanguageResolver
 
 model_base = getenv("MODEL_BASE")
 if not model_base:
@@ -22,6 +23,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 translator = translate.Translator(**sample_config)
+languages = LanguageResolver()
 
 @app.route('/')
 def index():
@@ -37,3 +39,8 @@ def api_translate_get(text):
 def api_translate():
     translation = translator.translate(request.get_json().get('text'))
     return json.dumps({ 'translation': translation })
+
+# Allow front-end to get all available language pairs
+@app.route('/api/languages', methods = ['GET'])
+def api_languages():
+    return json.dumps(languages.available_languages())
