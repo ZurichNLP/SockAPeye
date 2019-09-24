@@ -104,7 +104,7 @@ class TruecaseStep(ProcessStep):
 class DetruecaseStep(ProcessStep):
 
     def __init__(self,
-                 lang: str,
+                 lang: str = None,
                  load_from: str = None) -> None:
         """
 
@@ -157,7 +157,7 @@ class BpeStep(ProcessStep):
 class DebpeStep(ProcessStep):
 
     def __init__(self,
-                 lang: str,
+                 lang: str = None,
                  load_from: str = None) -> None:
         """
 

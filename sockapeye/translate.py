@@ -3,72 +3,63 @@
 from . import processor
 from . import adapter
 
-class Translator:
-    def __init__(self):
-        # Define some parameters - for now, hard-coded
-        self.src_lang = "de"
-        self.trg_lang = "en"
-        self.model_base = "/Users/raphael/projects/sockeye-toy-models/mt19_u6_model"
-        truecase_model = self.model_base + "/shared_models/truecase_model." + self.src_lang
 
-        bpe_model = self.model_base + "/shared_models/" + self.src_lang + self.trg_lang + ".bpe"
-        bpe_vocab = self.model_base + "/shared_models/vocab." + self.src_lang
-        vocab_threshold = 50
+class Translator:
+    def __init__(self,
+                 src_lang: str,
+                 trg_lang: str,
+                 model_path: str,
+                 truecase_model_path: str,
+                 bpe_model_path: str,
+                 bpe_vocab_path: str = None,
+                 bpe_vocab_threshold: int = 50) -> None:
+        """
+
+        :param src_lang:
+        :param trg_lang:
+        :param model_path:
+        :param truecase_model_path:
+        :param bpe_model_path:
+        :param bpe_vocab_path:
+        :param bpe_vocab_threshold:
+        """
+        self.src_lang = src_lang
+        self.trg_lang = trg_lang
+        self.model_path = model_path
+        self.truecase_model_path = truecase_model_path
+        self.bpe_model_path = bpe_model_path
+        self.bpe_vocab_path = bpe_vocab_path
+        self.bpe_vocab_threshold = bpe_vocab_threshold
 
         preprocessor_steps = [processor.NormalizeStep(lang=self.src_lang),
                               processor.TokenizeStep(lang=self.src_lang),
-                              processor.TruecaseStep(lang=self.src_lang, load_from=truecase_model),
+                              processor.TruecaseStep(lang=self.src_lang, load_from=self.truecase_model_path),
                               processor.BpeStep(lang=self.src_lang,
-                                                load_from=bpe_model,
-                                                vocab=bpe_vocab,
-                                                vocab_threshold=vocab_threshold)]
+                                                load_from=self.bpe_model_path,
+                                                vocab=self.bpe_vocab_path,
+                                                vocab_threshold=self.bpe_vocab_threshold)]
 
         self.preprocessor = processor.Processor(steps=preprocessor_steps)
 
+        postprocessor_steps = [processor.DebpeStep(),
+                               processor.DetruecaseStep(),
+                               processor.DetokenizeStep(lang=self.trg_lang)]
+
+        self.postprocessor = processor.Processor(steps=postprocessor_steps)
 
 
-        self.sockeye = SockeyeAdapter(self.model_base + "/models/model_wmt17")
 
-    def translate_lines(self, lines):
+        self.model = adapter.SockeyeAdapter(self.model_path)
 
-        for line in lines:
-            line = self.preprocessor.process(line)
-            line = self.translator.translate(line)
-            line = self.postprocessor.process(line)
+    def translate(self, line: str) -> str:
+        """
 
-            yield line
+        :param line:
+        :return:
+        """
+        line = self.preprocessor.process(line)
+        line = self.model.translate(line)
+        line = self.postprocessor.process(line)
 
-        lines = map(self.preprocess, input_lines)
-        
-        lines = map(self.translate, lines)
-        print(list(lines))
-        lines = map(self.postprocess, lines)
-        return list(lines)
-
-    def preprocess(self, line):
-        # Normalize
-        line = self.normalizer.normalize_punctuation(line)
-        # Tokenize
-        line = self.tokenizer.tokenize(line, split=False)
-        # Truecasing
-        line = self.truecaser.truecase_segment(line)
-        # BPE
-        line = self.bpe.encode_segment(line)
         return line
 
-    def postprocess(self, line):
-        # De-BPE
-        line = bpe_decode_segment(line)
-        # De-Truecase
-        line = self.detruecaser.detruecase_segment(line)
-        # De-Tokenize
-        line = self.detokenizer.detokenize(line)
-        return line
-
-    def translate(self, input):
-        return self.sockeye.translate(input)
-    
-
-# # Temporary testing
-# translator = Translator()
-# translator.preprocess_line("Hallo")
