@@ -3,3 +3,4 @@ sockeye
 subword_nmt
 flask
 flask-cors
+gunicorn
