@@ -4,8 +4,11 @@ from flask import Flask, request
 from flask_cors import CORS
 from sockapeye import translate
 import json
+from os import getenv
 
-model_base = "/Users/raphael/projects/sockeye-toy-models/mt19_u6_model"
+model_base = getenv("MODEL_BASE")
+if not model_base:
+    model_base = "/Users/raphael/projects/sockeye-toy-models/mt19_u6_model"
 
 sample_config = {"src_lang": "de",
                  "trg_lang": "en",
