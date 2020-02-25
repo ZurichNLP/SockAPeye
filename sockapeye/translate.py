@@ -83,7 +83,7 @@ class Translator:
         :return:
         """
 
-        raise NotImplemented
+        raise NotImplementedError
 
 
 

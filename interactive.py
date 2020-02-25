@@ -66,7 +66,7 @@ def interactive_loop(translator: translate.Translator) -> None:
                         logging_level = logging.CRITICAL
                     else:
                         logging_level = logging.DEBUG
-                    logging.basicConfig(level=logging_level)
+                    logging.getLogger().setLevel(logging_level)
                     continue
 
                 if step not in C.PREPROCESS_STEPS:
