@@ -6,7 +6,13 @@ from sockeye import inference
 
 
 class SockeyeAdapter:
-    def __init__(self, model_path: str) -> None:
+    def __init__(self, model_path: str, beam_size: int = 1) -> None:
+        """
+
+        :param model_path:
+        :param beam_size:
+        """
+
         brevity_penalty_weight = 1.0
         brevity_penalty = inference.BrevityPenalty(brevity_penalty_weight)
 
@@ -15,7 +21,7 @@ class SockeyeAdapter:
         self.models, self.source_vocabs, self.target_vocab = inference.load_models(
             context=context,
             max_input_len=None,
-            beam_size=1,
+            beam_size=beam_size,
             batch_size=1,
             model_folders=[model_path],
             checkpoints=None,
