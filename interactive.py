@@ -16,6 +16,9 @@ def parse_args():
     parser.add_argument("--beam-size", type=int, help="Decoding beam size",
                         required=False, default=1)
 
+    parser.add_argument("--quiet", "-q", type=bool, action="store_true", help="no debug output or logging",
+                        required=False, default=False)
+
     parser.add_argument("--steps", type=str, help="Pre-processing steps (postprocessing is determined based on pre-processing)",
                         nargs="+", required=False, default=[], choices=C.PREPROCESS_STEPS)
 
@@ -56,8 +59,12 @@ def main():
 
     args = parse_args()
 
-    logging.basicConfig(level=logging.DEBUG)
-    logging.debug(args)
+    if args.quiet:
+        logging_level = logging.CRITICAL
+    else:
+        logging_level = logging.DEBUG
+
+    logging.basicConfig(level=logging_level)
 
     if C.PREPROCESS_STEP_TRU in args.steps:
         assert args.truecase_model is not None
