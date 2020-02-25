@@ -71,7 +71,7 @@ class Translator:
 
         self.model = adapter.SockeyeAdapter(self.model_path, self.beam_size)
 
-        toc = tic - time.time()
+        toc = time.time() - tic
 
         logging.debug("Loading models and preparing translator took: %f s" % toc)
 
