@@ -60,6 +60,13 @@ def interactive_loop(translator: translate.Translator) -> None:
                 if cmd not in C.ESCAPE_CMDS:
                     print("Did not understand your escape command, sorry!")
 
+                if step == "q":
+                    if cmd == C.ESCAPE_CMD_ADD:
+                        logging_level = logging.CRITICAL
+                    else:
+                        logging_level = logging.DEBUG
+                    logging.basicConfig(level=logging_level)
+
                 if step not in C.PREPROCESS_STEPS:
                     print("Did not understand your step name, sorry!")
 
@@ -71,6 +78,7 @@ def interactive_loop(translator: translate.Translator) -> None:
                 print("  " + output)
 
         except KeyboardInterrupt:
+            print()
             exit(0)
 
 
