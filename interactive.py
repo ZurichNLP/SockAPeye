@@ -16,7 +16,7 @@ def parse_args():
     parser.add_argument("--beam-size", type=int, help="Decoding beam size",
                         required=False, default=1)
 
-    parser.add_argument("--quiet", "-q", type=bool, action="store_true", help="no debug output or logging",
+    parser.add_argument("--quiet", "-q", action="store_true", help="no debug output or logging",
                         required=False, default=False)
 
     parser.add_argument("--steps", type=str, help="Pre-processing steps (postprocessing is determined based on pre-processing)",
