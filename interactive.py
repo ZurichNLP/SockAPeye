@@ -45,7 +45,7 @@ def interactive_loop(translator: translate.Translator) -> None:
     """
     while True:
 
-        line = input(">")
+        line = input("> ")
 
         if line.strip() != "":
             output = translator.translate(line)
@@ -59,6 +59,12 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
     logging.debug(args)
 
+    if C.PREPROCESS_STEP_TRU in args.steps:
+        assert args.truecase_model is not None
+
+    if C.PREPROCESS_STEP_BPE in args.steps:
+        assert args.bpe_model is not None
+
     translator = translate.Translator(src_lang=args.src_lang,
                                       trg_lang=args.trg_lang,
                                       model_path=args.model,
@@ -70,7 +76,6 @@ def main():
                                       beam_size=args.beam_size)
 
     interactive_loop(translator)
-
 
 
 if __name__ == '__main__':
