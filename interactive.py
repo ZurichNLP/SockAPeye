@@ -52,7 +52,7 @@ def interactive_loop(translator: translate.Translator) -> None:
 
         if line.strip() != "":
             output = translator.translate(line)
-            print(output)
+            print("  " + output)
 
 
 def main():
