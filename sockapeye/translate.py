@@ -75,6 +75,18 @@ class Translator:
 
         logging.debug("Loading models and preparing translator took: %f s" % toc)
 
+    def update_steps(self, command: str, step: str) -> None:
+        """
+
+        :param command:
+        :param step:
+        :return:
+        """
+
+        raise NotImplemented
+
+
+
     def translate(self, line: str) -> str:
         """
 

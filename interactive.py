@@ -48,11 +48,30 @@ def interactive_loop(translator: translate.Translator) -> None:
     """
     while True:
 
-        line = input("> ")
+        try:
+            line = input("> ")
 
-        if line.strip() != "":
-            output = translator.translate(line)
-            print("  " + output)
+            if line.startswith(C.ESCAPE_CHAR):
+
+                parts = line.split(" ")
+
+                _, cmd, step = parts
+
+                if cmd not in C.ESCAPE_CMDS:
+                    print("Did not understand your escape command, sorry!")
+
+                if step not in C.PREPROCESS_STEPS:
+                    print("Did not understand your step name, sorry!")
+
+                translator.update_steps(command=cmd,
+                                        step=step)
+
+            if line.strip() != "":
+                output = translator.translate(line)
+                print("  " + output)
+
+        except KeyboardInterrupt:
+            exit(0)
 
 
 def main():
