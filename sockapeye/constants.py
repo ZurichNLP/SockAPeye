@@ -14,6 +14,10 @@ ESCAPE_CHAR = "/"
 
 ESCAPE_CMD_REMOVE = "-"
 ESCAPE_CMD_ADD = "+"
+ESCAPE_CMD_QUIET ="q"
+ESCAPE_CMD_VERBOSE = "v"
 
 ESCAPE_CMDS = [ESCAPE_CMD_REMOVE,
-               ESCAPE_CMD_ADD]
+               ESCAPE_CMD_ADD,
+               ESCAPE_CMD_QUIET,
+               ESCAPE_CMD_VERBOSE]

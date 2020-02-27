@@ -40,6 +40,48 @@ def parse_args():
     return args
 
 
+def parse_execute_escape_cmd(translator: translate.Translator,
+                             line: str) -> bool:
+    """
+
+    :param translator:
+    :param line:
+    :return:
+    """
+    parts = line.split(" ")
+
+    try:
+        _, cmd = parts
+    except ValueError:
+        print("Did not understand your escape command, sorry!")
+        return False
+
+    if cmd not in C.ESCAPE_CMDS:
+        print("Did not understand your escape command '%s', sorry!" % cmd)
+        return False
+
+    if cmd == C.ESCAPE_CMD_QUIET:
+
+        logging_level = logging.CRITICAL
+        logging.getLogger().setLevel(logging_level)
+
+        return True
+
+    if cmd == C.ESCAPE_CMD_VERBOSE:
+        logging_level = logging.DEBUG
+        logging.getLogger().setLevel(logging_level)
+
+        return True
+
+    if cmd == C.ESCAPE_CMD_REMOVE:
+        translator.disable_processing()
+        return True
+
+    if cmd == C.ESCAPE_CMD_ADD:
+        translator.enable_processing()
+        return True
+
+
 def interactive_loop(translator: translate.Translator) -> None:
     """
 
@@ -52,29 +94,8 @@ def interactive_loop(translator: translate.Translator) -> None:
             line = input("> ")
 
             if line.startswith(C.ESCAPE_CHAR):
-
-                parts = line.split(" ")
-
-                _, cmd, step = parts
-
-                if cmd not in C.ESCAPE_CMDS:
-                    print("Did not understand your escape command, sorry!")
-                    continue
-
-                if step == "q":
-                    if cmd == C.ESCAPE_CMD_ADD:
-                        logging_level = logging.CRITICAL
-                    else:
-                        logging_level = logging.DEBUG
-                    logging.getLogger().setLevel(logging_level)
-                    continue
-
-                if step not in C.PREPROCESS_STEPS:
-                    print("Did not understand your step name, sorry!")
-                    continue
-
-                translator.update_steps(command=cmd,
-                                        step=step)
+                parse_execute_escape_cmd(translator, line)
+                continue
 
             if line.strip() != "":
                 output = translator.translate(line)

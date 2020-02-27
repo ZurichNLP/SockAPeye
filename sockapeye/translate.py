@@ -69,23 +69,27 @@ class Translator:
         self.preprocessor = processor.Processor(steps=preprocessor_steps)
         self.postprocessor = processor.Processor(steps=postprocessor_steps)
 
+        self.processing_enabled = True
+
         self.model = adapter.SockeyeAdapter(self.model_path, self.beam_size)
 
         toc = time.time() - tic
 
         logging.debug("Loading models and preparing translator took: %f s" % toc)
 
-    def update_steps(self, command: str, step: str) -> None:
+    def disable_processing(self) -> None:
         """
 
-        :param command:
-        :param step:
         :return:
         """
+        self.processing_enabled = False
 
-        raise NotImplementedError
+    def enable_processing(self) -> None:
+        """
 
-
+        :return:
+        """
+        self.processing_enabled = True
 
     def translate(self, line: str) -> str:
         """
@@ -93,7 +97,8 @@ class Translator:
         :param line:
         :return:
         """
-        line = self.preprocessor.process(line)
+        if self.processing_enabled:
+            line = self.preprocessor.process(line)
 
         tic = time.time()
         line = self.model.translate(line)
@@ -101,7 +106,8 @@ class Translator:
 
         logging.debug("Translation time: %f seconds" % (toc - tic))
 
-        line = self.postprocessor.process(line)
+        if self.processing_enabled:
+            line = self.postprocessor.process(line)
 
         return line
 
