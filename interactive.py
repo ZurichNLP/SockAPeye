@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import readline
 
 from sockapeye import translate
 from sockapeye import constants as C
